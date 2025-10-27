@@ -5,6 +5,7 @@ import { single, Subscriber } from 'rxjs';
 import { Result } from 'postcss';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ToastService } from '../../core/services/toast-service';
+import { themes } from '../theme';
 
 @Component({
   selector: 'app-nav',
@@ -18,6 +19,21 @@ export class Nav {
 
   private router = inject(Router);
   private toast = inject(ToastService);
+
+  protected selectedTheme = signal<string>(localStorage.getItem('theme') || 'light');
+  protected themes = themes;
+
+  ngOnInit(): void {
+    document.documentElement.setAttribute('data-theme', this.selectedTheme());
+  }
+
+  handleSelectTheme(theme: string) {
+    this.selectedTheme.set(theme);
+    localStorage.setItem('theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
+    const elem = document.activeElement as HTMLDivElement;
+    if (elem) elem.blur();
+  }
 
   login() {
     this.accountService.login(this.creds).subscribe({
